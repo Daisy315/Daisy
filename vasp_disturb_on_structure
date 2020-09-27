@@ -1,0 +1,96 @@
+# -*- coding: utf-8 -*-
+"""
+Created on Sat Sep 19 23:06:48 2020
+
+@author: fangmd
+Transfer CONTCAR to POSCAR with slight disturbance on all atoms’ coordinates
+"""
+
+import numpy as np
+import os
+import sys
+
+if len(sys.argv) == 1:  #获取当前正在执行的命令行参数的参数列表(list)
+    POSCAR_num = 50
+else:
+    try:
+        POSCAR_num = int(sys.argv[1])  #sys.argv[1]第一个参数，需要生成多少个结构
+    except:
+        raise SyntaxError("Number is needed.")
+
+#读取CONCTAR文件内容并打印到屏幕上，获取CONTCAR信息
+file = "CONTCAR"
+with open(file,'r') as reader:
+    title = reader.readline()
+    scale = float(reader.readline())
+    # x=tuple(map(float,reader.readline().split()))
+    # y=tuple(map(float,reader.readline().split()))
+    # z=tuple(map(float,reader.readline().split()))
+    base_vector = np.zeros([3,3],dtype = np.float)
+    # for i in range(0,3):
+        # base_vector[0,i]=x[i]
+        # base_vector[1,i]=y[i]
+        # base_vector[2,i]=z[i]
+    for i in range(3):
+        base_vector[i] = tuple(map(float,reader.readline().split())) #读取晶胞矢量
+    element = reader.readline().split() #读取CONTCAR中所含的原子类型
+    num_str = reader.readline().split() #读取各种原子的个数
+    num_str = [i.strip() for i in num_str] #去除num_str前后的空格
+    num=list(map((int),num_str)) #将num_str每个元素转换为Int并存成List
+    elements_num = len(num)
+    tmp = ' and '.join(element) #将element字符串用and连接并输出到新的字符串中
+    tmp_num = ' and '.join(num_str)
+    print('the elements in the calculation include %s,with number \
+%s,your poscar is in %s coordinate'  %(tmp,tmp_num,reader.readline()))
+  
+#获取原子的真实坐标
+    atom_nums = sum(num) #获取CONTCAR的总原子个数
+    tmp=np.zeros([atom_nums,3],dtype = np.float)
+    for i in range(atom_nums):
+        tmp[i] = list(map(float,reader.readline().split())) #同base_vector
+    cartesian_coordinates=np.matmul(tmp,base_vector) 
+    cartesian_coordinates*=scale #获取原子的真实坐标
+#np.matmul 矩阵相乘
+#np.dot 矩阵相乘
+#mat.multiply 对应位置的元素相乘，*
+    invert_base_vector = np.linalg.inv(base_vector) #矩阵求逆
+
+#将读取的CONTCAR信息前八行转化为字符串格式
+    for_writen = "%s\n" %("POSCAR By FMD")
+    for_writen += "%f\n" %(scale)
+    for i in range(3):
+        for_writen += "{0:f} {1:f} {2:f}\n" .format(*(base_vector[i]))
+        #for_writen += "%f %f %f\n" %(base_vector[i][0],base_vector[i][1],base_vector[i][2])
+    for_writen += '%s\n' %(' '.join(element))
+    for_writen += '%s\n' %(' '.join(num_str))
+# scale_poscar=str(scale)
+# my_list1 = base_vector.tolist()
+# base_vector_poscar = str(my_list1[0][0])+"\000"+str(my_list1[0][1])+"\000"+str(my_list1[0][2])+"\n"+str(my_list1[1][0])+"\000"+str(my_list1[1][1])+"\000"+str(my_list1[1][2])+"\n"+str(my_list1[2][0])+"\000"+str(my_list1[2][1])+"\000"+str(my_list1[2][2])
+# b = str()
+# for i in range(0,3):
+#     for j in range(0,3):
+#         a=str(my_list1[i][j])+str(" ")
+#         if j == 2&i==2:
+#             b += a
+#         elif j == 2:
+#             b += a + "\n"
+#         else:
+#             b += a
+# element_poscar=str(element[0])+"\000"+str(element[1])
+# num_poscar=str(num[0])+"\000"+str(num[1])
+
+#改变原子坐标并输出到POSCAR文件中，生成POSCAR_num种不同结构的POSCAR文件
+    for k in range(1,POSCAR_num+1):
+        fluctuation=np.random.rand(atom_nums,3)
+        coordiantes_transfered=fluctuation*0.2+cartesian_coordinates
+        #my_list2 = coordiantes_transfered.tolist()
+        path=os.path.join('POSCARs',"%d" %k)  
+        os.makedirs(path,mode=0o777,exist_ok=1)
+        with open(os.path.join(path,"POSCAR"),'w') as writer: #在当前目录下生成新目录
+            writer.write(for_writen) #将for_writen写入POSCAR
+            writer.write('%s\n' %("Direct"))
+            direct_coordinates=np.matmul(coordiantes_transfered,invert_base_vector) 
+            direct_coordinates/=scale #将真实坐标转化为分数坐标
+            for i in range(atom_nums):
+                 #writer.write("%f %f %f\n" %(direct_coordinates[i][0],direct_coordinates[i][1],direct_coordinates[i][2]))  
+                writer.write("{0:f} {1:f} {2:f}\n" .format(*(direct_coordinates[i])))
