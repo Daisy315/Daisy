@@ -1,0 +1,26 @@
+#/bin/bash
+#PBS -N vasp
+#PBS -q batch
+#PBS -l nodes=node13:ppn=20
+#PBS -j oe
+#PBS -l walltime=1000:0:0
+
+nprocs=`cat $PBS_NODEFILE | wc -l`
+source /public/software/profile.d/compiler_intel-compiler-2017.5.239.sh
+source /public/software/profile.d/mpi_intelmpi-2017.4.239.sh
+cd $PBS_O_WORKDIR 
+
+#tmp=`cat POTCAR |grep -i "ENMAX"| egrep -o "[0-9]+[.]"`
+#b=`$tmp | tr -cd "[0-9]"`
+b=$(basename `grep ENMAX POTCAR | awk '{print $3}'` \;)
+for c in $(seq 1.1 0.1 2.0);do
+	a=`echo "scale=5; $b * $c" | bc`;
+	for i in ${a};do 
+		mkdir ${a};
+		cd ${a};
+		cp ../POSCAR ../POTCAR ../KPOINTS ./;
+		/public/home/apclab/fangmd/bin/INCAR.sh ${a};
+		mpirun -np $nprocs -machinefile $PBS_NODEFILE /public/software/apps/vasp/vasp.5.4.4-erwei/bin/vasp_std;
+		cd ../;
+	done
+done
