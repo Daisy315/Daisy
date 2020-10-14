@@ -1,0 +1,20 @@
+#/bin/bash
+#PBS -N vasp
+#PBS -q batch
+#PBS -l nodes=1:ppn=24
+#PBS -j oe
+#PBS -l walltime=1000:0:0
+
+nprocs=`cat $PBS_NODEFILE | wc -l`
+source /public/software/profile.d/compiler_intel-compiler-2017.5.239.sh
+source /public/software/profile.d/mpi_intelmpi-2017.4.239.sh
+cd $PBS_O_WORKDIR 
+
+for i in $(seq 0.03 0.01 0.07);do 
+	mkdir ${i};
+	cp POSCAR INCAR POTCAR  ${i};
+	cd ${i};
+	(echo 1 ;echo 102;echo 2;echo ${i}) | /public/home/apclab/fangmd/softwares/vaspkit.1.20/bin/vaspkit;
+	mpirun -np $nprocs -machinefile $PBS_NODEFILE /public/software/apps/vasp/vasp.5.4.4-erwei/bin/vasp_std;
+	cd ../;
+done
