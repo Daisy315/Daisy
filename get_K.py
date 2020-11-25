@@ -3,10 +3,11 @@
 import numpy as np
 import sys
 
-if len(sys.argv)==1:
+tmp = sys.argv
+if len(tmp)==1:
     _density = 0.03
 else:
-    _density = float(sys.argv[1])
+    _density = float(tmp[1])
 
 lattice = np.zeros((3,3))
 with open("POSCAR") as reader:
@@ -28,4 +29,11 @@ with open("POSCAR") as reader:
     density *= 2.0 * np.math.pi
     K_1, K_2, K_3 = (int(round(b1/density)),int(round(b2/density)),int(round(b3/density)))
     K_1, K_2, K_3 = (max(1,K_1),max(1,K_2),max(1,K_3))
-    print(K_1, K_2, K_3)
+    file = open("KPOINTS", "w")
+    content = "KPT-Resolved Value to Generate K-Mesh:%.2f\n" %(_density)
+    content += "%s\n" %("0")
+    content += "%s\n" %("Gamma")
+    content += "%d %d %d\n" %(K_1,K_2,K_3)
+    content += "%s\n " %("0 0 0")
+    file.write(content)
+    file.close()
