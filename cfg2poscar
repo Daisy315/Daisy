@@ -1,0 +1,39 @@
+#By nxu
+#total.cfg2single.cfg
+
+import re
+import random
+import os
+with open ("new.cfg") as reader:
+    string = reader.read()
+    pattern = r'BEGIN_CFG.*?END_CFG'
+    tmp = re.findall(pattern,string,re.S)
+    random.shuffle(tmp)
+for index,i in enumerate(tmp,start=1):
+    dirname = "%d" %index
+    os.mkdir(dirname)
+    path = os.path.join(dirname,"single.cfg")
+    with open(path,mode = "w") as writer:
+        writer.write(i+"\n")
+        
+#single.cfg2poscar
+#/bin/bash
+#PBS -N vasp
+#PBS -q batch
+#PBS -l nodes=node13:ppn=20
+#PBS -j oe
+#PBS -l walltime=1000:0:0
+
+nprocs=`cat $PBS_NODEFILE | wc -l`
+source /public/software/profile.d/compiler_intel-compiler-2017.5.239.sh
+source /public/software/profile.d/mpi_intelmpi-2017.4.239.sh
+source /public/software/profile.d/mlp_lammps.sh
+cd $PBS_O_WORKDIR
+
+for i in `ls -F | grep "/"`;do
+	cd $i;
+	cp ../INCAR ../POTCAR ../KPOINTS  ./;
+	mlp convert-cfg single.cfg  POSCAR    --output-format=vasp-poscar;   cfg2poscar
+	mpirun -np $nprocs -machinefile $PBS_NODEFILE /public/software/apps/vasp/vasp.5.4.4-erwei/bin/vasp_std;
+	cd ../;
+done
