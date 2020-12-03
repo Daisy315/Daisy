@@ -1,3 +1,5 @@
+#vasp 通过vaspkit改变K点密度的pbs脚本
+
 #/bin/bash
 #PBS -N vasp
 #PBS -q batch
