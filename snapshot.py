@@ -1,8 +1,10 @@
+#读取XDATCAR文件并每隔目标帧数存一次POSCAR
+
 # -*- coding: utf-8 -*-
 """
 Created on Sat Sep 26 18:04:11 2020
 
-@author: nxu fangmd
+@author: nxu Daisy
 
 Plan A:以"Direct configuration"字样或其他明显的重复单元标志区别帧数
 读取XDATCAR输入文件
