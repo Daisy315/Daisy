@@ -1,4 +1,6 @@
-#By nxu
+#根据POSCAR的基矢得到K点密度并生成KPOINTS
+
+#By nxu + Daisy
 
 import numpy as np
 import sys
