@@ -1,0 +1,27 @@
+import numpy as np
+import sys
+import math
+
+if len(sys.argv) <=1:
+    print("wrong")
+    sys.exit(1)
+data=np.loadtxt(sys.argv[1])
+a=int(data.shape[0])
+data_1=[]
+data_2=[]
+data_3=[]
+data_4=[]
+data_5=[]
+for i in range(a):
+    data_1.append(data[i,0])#CCSD
+    data_2.append(data[i,1])#PBEPBE
+    data_3.append(data[i,2])#b3lyp
+    data_4.append(data[i,3])#scan0
+    data_5.append(data[i,4])#pbe0
+y=data_1
+y_hat=data_2
+tmp=0
+for i in range(len(y)):
+    tmp += (y[i] - y_hat[i])**2
+RMSE = math.sqrt(tmp/len(y))
+print("RMSE is %f" %(RMSE))
