@@ -46,7 +46,7 @@ filesize = os.path.getsize(file)
 with open(file,'r') as reader:
     title = reader.readline()
     scale = float(reader.readline())
-    base_vector = np.zeros([3,3],dtype = np.float)
+    base_vector = np.zeros([3,3],dtype = np.float64)
     for i in range(3):
         base_vector[i] = tuple(map(float,reader.readline().split())) 
     element = reader.readline().split() 
