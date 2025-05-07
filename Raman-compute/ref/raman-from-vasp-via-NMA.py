@@ -11,7 +11,7 @@
 # URL: http://raman-sc.github.io
 #
 # MIT license, 2013 - 2016
-#
+#读取VASP的phonons的计算结果，自动生成三点差分的正负位移的POSCARs，进行介电常数的计算，并处理获得拉曼活性activity.需要注意的是(1) VASP输出的“Eigenvectors after division by SQRT(mass)”是动力学矩阵dynamical_matrix的特征向量/amu^(1/2),并不是非质权的矩阵的特征向量(for reference: https://w.vasp.at/forum/viewtopic.php?t=17337),在此处并没有影响;(2)如果需要自动配置文件和提交任务需要在脚本内配置好环境
 
 
 import re
