@@ -336,14 +336,14 @@ if __name__ == '__main__':
             #
             for m in range(3):
                 for n in range(3):
-                    ra[m][n]   += eps[m][n] * coeffs[j]/step_size * norm * vol/(4.0*pi)  #coeffs = [-0.5, 0.5],三点差分变式，相当于(正负位移下的eps的差值*1/2*步长)*norm*vol/4pi
+                    ra[m][n]   += eps[m][n] * coeffs[j]/step_size * norm * vol/(4.0*pi)  #coeffs = [-0.5, 0.5],三点差分变式，相当于(正负位移下的eps的差值*1/2*步长)*norm*vol/4pi，进行了介电张量和极化率张量之间的转换，epsilon=1+4pi*polar
             #units: A^2/amu^1/2 =         dimless   * 1/A         * 1/amu^1/2  * A^3
         #
         alpha = (ra[0][0] + ra[1][1] + ra[2][2])/3.0
         beta2 = ( (ra[0][0] - ra[1][1])**2 + (ra[0][0] - ra[2][2])**2 + (ra[1][1] - ra[2][2])**2 + 6.0 * (ra[0][1]**2 + ra[0][2]**2 + ra[1][2]**2) )/2.0
         print( "") 
         print( "! %4i  freq: %10.5f  alpha: %10.7f  beta2: %10.7f  activity: %10.7f " % (i+1, eigval, alpha, beta2, 45.0*alpha**2 + 7.0*beta2))
-        output_fh.write("%03i  %10.5f  %10.7f  %10.7f  %10.7f\n" % (i+1, eigval, alpha, beta2, 45.0*alpha**2 + 7.0*beta2))
+        output_fh.write("%03i  %10.5f  %10.7f  %10.7f  %10.7f\n" % (i+1, eigval, alpha, beta2, 45.0*alpha**2 + 7.0*beta2)) #单位是A^4/amu
         output_fh.flush()
     #
     output_fh.close()
