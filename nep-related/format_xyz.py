@@ -1,3 +1,5 @@
+#需要修改原子序号和原子类型对应关系，参考lammps手册https://docs.lammps.org/Howto_triclinic.html
+
 import re
 import math
 
